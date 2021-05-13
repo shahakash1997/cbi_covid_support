@@ -2,7 +2,6 @@ const tedious = require("tedious");
 const Connection = tedious.Connection;
 const Request = require('tedious').Request;
 const TYPES = require('tedious').TYPES;
-const async = require('async');
 
 
 const config = {
@@ -22,7 +21,14 @@ const config = {
 
 function handleConnection(err) {
     if (err) console.error("error connecting :-(", err);
-    else console.log("successfully connected!!");
+    else {
+        console.log("successfully connected!!");
+        MSDBService.getDbServiceInstance().getCovidSupportOptions().then((data => {
+            console.log(data)
+        })).catch(err => {
+            console.log(err)
+        });
+    }
 }
 
 let connection = new Connection(config);
@@ -31,7 +37,7 @@ connection.on("connect", handleConnection);
 
 let dbService = null;
 
-module.exports = class MSDBService {
+class MSDBService {
     static getDbServiceInstance() {
         return dbService ? dbService : new MSDBService();
     }
@@ -44,16 +50,30 @@ module.exports = class MSDBService {
         try {
             return new Promise(((resolve, reject) => {
                 const request = new Request(
-                    'select * from cbi_covid_support.support_options;;',
+                    'select * from cbi_covid_support.support_options;',
                     function (err, rowCount, rows) {
                         if (err) {
                             reject(new Error(err.message));
 
                         } else {
+                            console.log(rowCount)
                             console.log(rows)
                             resolve(rows);
                         }
-                    });
+
+                        connection.close();
+                    })
+                var response = [];
+                request.on('row', function (columns) {
+                    columns.forEach(function (column) {
+                        /*if (column.value === null) {
+                            console.log('NULL')
+                        } else {
+                            console.log(column.value)
+                        }*/
+                    })
+                })
+                console.log(response)
                 connection.execSql(request);
             }));
 
@@ -62,4 +82,7 @@ module.exports = class MSDBService {
     }
 
 };
+
+MSDBService.getDbServiceInstance().connect();
+
 
