@@ -1,25 +1,15 @@
 const express = require("express");
 const app = express();
-const logger = require("./utils/logger");
 const dbService = require("./database/databaseConfig");
 const patientGHandler = require("./handlers/patientHandler");
 const covidSupport = require("./handlers/covidSupport");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
-
-
 app.use(morgan())
-
-
 dotenv.config();
-const MSDBService = require("./database/msSQLDbConfig");
 
-MSDBService.getDbServiceInstance().connect();
 
-const db = dbService.getDbServiceInstance();
-
-db.connect();
 
 app.use(express.json());
 app.use(cors());

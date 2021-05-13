@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const DBService = require("../database/databaseConfig");
+const DBService = require("../database/sqlDatabase");
 const Utils = require("../utils/utils");
 
 router.get("/getPatient/:empID", async (req, res, next) => {

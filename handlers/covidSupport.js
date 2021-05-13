@@ -1,80 +1,65 @@
 const express = require('express');
 const router = express.Router();
-const DBService = require("../database/databaseConfig");
-const MSDBService = require('../database/msSQLDbConfig');
+const DBService = require("../database/sqlDatabase");
 
 
-
-router.get('/getHelpRequests/:patientID',(req,res,next)=>{
+router.get('/getHelpRequests/:patientID', (req, res, next) => {
     DBService.getDbServiceInstance()
-    .getRequestedSupportByPatientID(req.params.patientID)
-    .then(data=>{
-        res.status(200);
-        res.json({data : data});
-    }).catch(err=>{
+        .getRequestedSupportByPatientID(req.params.patientID)
+        .then(data => {
+            res.status(200);
+            res.json({data: data});
+        }).catch(err => {
         res.status(400);
-        res.json({err: err,errorMessage : "Unable to find Requests"})
+        res.json({err: err, errorMessage: "Unable to find Requests"})
     })
 
 });
 
 
-router.get('/getComments/:helpReqID',(req,res,next)=>{
+router.get('/getComments/:helpReqID', (req, res, next) => {
 
     DBService.getDbServiceInstance()
-    .getCommentsByReqID(req.params.helpReqID)
-    .then(data=>{
-        res.status(200);
-        res.json({data : data});
-    }).catch(err=>{
+        .getCommentsByReqID(req.params.helpReqID)
+        .then(data => {
+            res.status(200);
+            res.json({data: data});
+        }).catch(err => {
         res.status(400);
-        res.json({err: err,errorMessage : "Unable to find Requests"})
+        res.json({err: err, errorMessage: "Unable to find Requests"})
     })
 
 
 });
 
 
-router.post('/addComment/',(req,res,next)=>{
+router.post('/addComment/', (req, res, next) => {
     console.log(req.body);
     DBService.getDbServiceInstance()
-    .addNewComment(req.body)
-    .then(data=>{
-        res.status(200);
-        res.json({data : 'Comment added successfully'});
-    }).catch(err=>{
+        .addNewComment(req.body)
+        .then(data => {
+            res.status(200);
+            res.json({data: 'Comment added successfully'});
+        }).catch(err => {
         res.status(400);
-        res.json({err: err.message,errorMessage : "Unable to add comment"})
+        res.json({err: err.message, errorMessage: "Unable to add comment"})
     })
 
 
 });
 
 
-
-router.get('/getSupportOptions/v1',(req,res)=>{
-    MSDBService.getDbServiceInstance().getCovidSupportOptions()
-        .then(data=>{res.status(200);
-            res.json({data : data});
-        })
-        .catch(err=>{
-            res.status(400);
-            res.json({errorMessage : "Data Not found"})
-        })
-});
-
-router.get('/getSupportOptions',(req,res)=>{
+router.get('/getSupportOptions', (req, res) => {
     DBService.getDbServiceInstance()
-    .getCovidSupportOptions()
-    .then(data=>{res.status(200);
-    res.json({data : data});
-})
-.catch(err=>{
-    res.status(400);
-    res.json({errorMessage : "Data Not found"})
-})
-
-
+        .getCovidSupportOptions()
+        .then(result => {
+            res.status(200);
+            res.json({data:result.recordsets[0]})
+        }).catch(err => {
+        console.log(err);
+        res.status(400);
+        res.json({errorMessage: "Data Not found"})
+    });
 });
 
 module.exports = router;
