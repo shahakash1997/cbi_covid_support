@@ -1,5 +1,4 @@
 const mysql = require("mysql");
-const logger = require("../utils/logger");
 const utils = require("../utils/utils");
 const connection = mysql.createConnection({
   host: "localhost",
@@ -17,9 +16,9 @@ module.exports = class DBService {
   connect() {
     connection.connect(function (err) {
       if (err) {
-        logger.log("error connecting: " + err.stack);
+        console.log("error connecting: " + err.stack);
       }
-      logger.debug("connected as id " + connection.threadId);
+      console.debug("connected as id " + connection.threadId);
     });
   }
 
@@ -40,7 +39,6 @@ module.exports = class DBService {
 
       return response;
     } catch (err) {
-      logger.debug(err);
     }
   }
 
@@ -57,7 +55,6 @@ module.exports = class DBService {
         });
       });
     } catch (error) {
-      logger.log(error);
     }
   }
 
@@ -114,7 +111,6 @@ module.exports = class DBService {
         );
       });
     } catch (error) {
-      logger.debug(error);
     }
   }
 
@@ -153,16 +149,12 @@ module.exports = class DBService {
       return new Promise((resolve, reject) => {
         const query =
           "select  * from requested_covid_supports where patient_id=?";
-          console.log(patientID);
         connection.query(query, [patientID], (err, results) => {
-          console.log(err);
-          console.log(results);
           if (err) reject(new Error(err.message));
           else resolve(results);
         });
       });
     } catch (error) {
-      logger.debug(error);
     }
   }
 };

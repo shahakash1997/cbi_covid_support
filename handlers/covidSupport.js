@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const DBService = require("../database/databaseConfig");
-const MSDBService = require('../database/msSQLDbConfig');
 
 
 
@@ -52,16 +51,6 @@ router.post('/addComment/',(req,res,next)=>{
 
 
 
-router.get('/getSupportOptions/v1',(req,res)=>{
-    MSDBService.getDbServiceInstance().getCovidSupportOptions()
-        .then(data=>{res.status(200);
-            res.json({data : data});
-        })
-        .catch(err=>{
-            res.status(400);
-            res.json({errorMessage : "Data Not found"})
-        })
-});
 
 router.get('/getSupportOptions',(req,res)=>{
     DBService.getDbServiceInstance()
