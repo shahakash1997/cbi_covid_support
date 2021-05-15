@@ -14,3 +14,25 @@ create table employee
 	token_details varchar(5000) null
 );
 alter table patient add covid_postive_date date null;
+
+create table StaffEmployee
+(
+    StaffEmpNo   text null,
+    name         text null,
+    LocationType text null,
+    LocationID   text null,
+    BranchName   text null,
+    RegionID     text null,
+    RegionName   text null,
+    ZoneID       text null,
+    ZoneName     text null,
+    email        text null,
+    mobile       text null,
+    role         text null,
+    active       text null,
+    EnteredDt    text null,
+    ModifiedDt   text null,
+    DeletedDt    text null,
+    Alt_mobile   text null
+);
+
