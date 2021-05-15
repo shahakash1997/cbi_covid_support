@@ -3,6 +3,7 @@ const app = express();
 const dbService = require("./database/databaseConfig");
 const patientGHandler = require("./handlers/patientHandler");
 const covidSupport = require("./handlers/covidSupport");
+const authSupport = require('./handlers/authHandler');
 const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/patient", patientGHandler);
 app.use("/covidSupport", covidSupport);
+app.use("/auth",authSupport);
 
 app.listen(process.env.PORT, () => {
   console.log("Listening on Port " + process.env.PORT);

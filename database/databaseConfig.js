@@ -42,6 +42,27 @@ module.exports = class DBService {
     }
   }
 
+  async getEmployeeByID(){
+    try {
+      return new Promise((resolve,reject)=>{
+        const query = 'select * from employee where empID= ?';
+        connection.query(query, (err, results) => {
+          if (err) {
+            reject(new Error(err.message));
+          } else {
+            resolve(results);
+          }
+        });
+
+
+      });
+      
+    } catch (err) {
+      console.log(err);
+      
+    }
+  }
+
   async getCovidSupportOptions() {
     try {
       return new Promise((resolve, reject) => {
