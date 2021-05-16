@@ -1,3 +1,4 @@
+const { reject } = require("async");
 const mysql = require("mysql");
 const utils = require("../utils/utils");
 const connection = mysql.createConnection({
@@ -26,6 +27,19 @@ module.exports = class DBService {
     connection.end();
   }
 
+  async getAllPatientsByLocation(region) {
+    try {
+      return new Promise((resolve, reject) => {
+        const query = "select * from patient where regionID=?;";
+        connection.query(query, [region], (err, results) => {
+          if (err) {
+            reject(new Error(err.message));
+          } else resolve(results);
+        });
+      });
+    } catch (error) {}
+  }
+
   async getAllPatientsByEmployeeID(empID) {
     try {
       const response = await new Promise((resolve, reject) => {
@@ -38,28 +52,45 @@ module.exports = class DBService {
       });
 
       return response;
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
-  async getEmployeeByID(){
+  async getEmployeeByID(empID) {
     try {
-      return new Promise((resolve,reject)=>{
-        const query = 'select * from employee where empID= ?';
-        connection.query(query, (err, results) => {
+      return new Promise((resolve, reject) => {
+        const query = "select * from StaffEmployee where StaffEmpNo=?;";
+        connection.query(query, [empID], (err, results) => {
           if (err) {
             reject(new Error(err.message));
           } else {
             resolve(results);
           }
         });
-
-
       });
-      
     } catch (err) {
       console.log(err);
-      
+    }
+  }
+
+  async updateEmailAndPhone(data) {
+    try {
+      return new Promise((resolve, reject) => {
+        const query =
+          "UPDATE StaffEmployee t SET t.email=?,t.mobile =? WHERE t.StaffEmpNo=?";
+        connection.query(
+          query,
+          [data.email, data.mobile, data.empID],
+          (err, results) => {
+            if (err) {
+              reject(new Error(err.message));
+            } else {
+              resolve(results);
+            }
+          }
+        );
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -75,16 +106,15 @@ module.exports = class DBService {
           }
         });
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   async insertNewPatient(patient) {
     try {
       return new Promise((resolve, reject) => {
         const query =
-          "INSERT INTO patient (empID, name, age, relation, mobile, location, locationZO, locationRO, gender)\
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          "INSERT INTO patient (empID, name, age, relation, mobile, location, locationZO, locationRO, gender,covid_postive_date,regionID,zoneID,email)\
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,?,?)";
 
         connection.query(
           query,
@@ -95,13 +125,17 @@ module.exports = class DBService {
             patient.relation,
             patient.mobile,
             patient.location,
-            patient.zo,
-            patient.ro,
+            patient.selectedZone.branch_name,
+            patient.selectedRegion.branch_name,
             patient.gender,
+            patient.covidPosDate,
+            patient.selectedRegion.branch_code,
+            patient.selectedZone.branch_code,
+            patient.email,
           ],
           (err, results) => {
             if (err) {
-              reject(new Error(err));
+              reject(new Error(err.message));
             } else {
               var patientID = results.insertId;
               var responseResults = [];
@@ -131,8 +165,7 @@ module.exports = class DBService {
           }
         );
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   getCommentsByReqID(reqID) {
@@ -151,15 +184,35 @@ module.exports = class DBService {
   addNewComment(commentData) {
     try {
       return new Promise((resolve, reject) => {
-        if (!commentData || !utils.checkForMandatoryFields(commentData,['id','comments','empName','empID'])) reject(new Error("Empty comment body"));
+        if (
+          !commentData ||
+          !utils.checkForMandatoryFields(commentData, [
+            "id",
+            "comments",
+            "empName",
+            "empID",
+          ])
+        )
+          reject(new Error("Empty comment body"));
         else {
-          const query ='INSERT INTO cbi_covid_support.help_comments (requested_support_id, comments, updateByName, updatedBy, datetime)\
-          VALUES (?, ?, ?, ?, ?)'
+          const query =
+            "INSERT INTO cbi_covid_support.help_comments (requested_support_id, comments, updateByName, updatedBy, datetime)\
+          VALUES (?, ?, ?, ?, ?)";
 
-          connection.query(query, [commentData.id, commentData.comments,commentData.empName,commentData.empID,new Date()],(err,results)=>{
-            if(err) reject(new Error(err.message));
-            else resolve(results);
-          });
+          connection.query(
+            query,
+            [
+              commentData.id,
+              commentData.comments,
+              commentData.empName,
+              commentData.empID,
+              new Date(),
+            ],
+            (err, results) => {
+              if (err) reject(new Error(err.message));
+              else resolve(results);
+            }
+          );
         }
       });
     } catch (error) {}
@@ -175,7 +228,6 @@ module.exports = class DBService {
           else resolve(results);
         });
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 };

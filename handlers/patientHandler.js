@@ -4,7 +4,6 @@ const DBService = require("../database/databaseConfig");
 const Utils = require("../utils/utils");
 
 router.get("/getPatient/:empID", async (req, res, next) => {
-  console.log('/getPatient');
   const empID = req.params.empID;
   DBService.getDbServiceInstance()
     .getAllPatientsByEmployeeID(empID)
@@ -16,6 +15,21 @@ router.get("/getPatient/:empID", async (req, res, next) => {
       res.status(400);
       res.json({ data: [] });
     });
+});
+
+
+router.get('/getPatientByRO/:region',async (req,res,next)=>{
+  DBService.getDbServiceInstance()
+    .getAllPatientsByLocation(req.params.region)
+    .then((data) => {
+      res.status(200);
+      res.json({ data: data });
+    })
+    .catch((err) => {
+      res.status(400);
+      res.json({ err:err,errorMessage: "No data found"});
+    });
+
 });
 
 router.get("/getRequirementsByPID/:patientID", (req, res, next) => {
@@ -40,18 +54,17 @@ router.post("/addPatient", async (req, res, next) => {
     "age",
     "relation",
     "mobile",
-    "zo",
-    "ro",
+    "selectedRegion",
+    "selectedZone",
     "gender",
     "support_requests",
   ]);
-  console.log('check is '+check);
   if (check) {
     DBService.getDbServiceInstance()
       .insertNewPatient(req.body)
       .then((data) => {
         res.status(200);
-        res.json({ data: "patient added successfully" });
+        res.json({ data: "Patient added successfully" });
       })
       .catch((err) => {
         res.status(400);
