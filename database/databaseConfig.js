@@ -1,20 +1,15 @@
-const { reject } = require("async");
 const mysql = require("mysql");
 const utils = require("../utils/utils");
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "2020",
-  database: "cbi_covid_support",
-});
 
 let dbService = null;
+let connection = null;
 
 module.exports = class DBService {
   static getDbServiceInstance() {
     return dbService ? dbService : new DBService();
   }
-  connect() {
+  connect(config) {
+    connection = mysql.createConnection(config);
     connection.connect(function (err) {
       if (err) {
         console.log("error connecting: " + err.stack);

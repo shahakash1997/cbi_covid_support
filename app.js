@@ -7,14 +7,18 @@ const authSupport = require('./handlers/authHandler');
 const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
-
-
 app.use(morgan())
-
-
 dotenv.config();
 
-dbService.getDbServiceInstance().connect();
+
+const dbConfig = {
+  host: process.env.HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+};
+
+dbService.getDbServiceInstance().connect(dbConfig);
 
 
 app.use(express.json());
